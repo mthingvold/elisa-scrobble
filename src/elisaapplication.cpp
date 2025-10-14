@@ -9,13 +9,14 @@
 
 #include "musiclistenersmanager.h"
 
+#include "audiowrapper.h"
+#include "databaseinterface.h"
+#include "manageaudioplayer.h"
+#include "manageheaderbar.h"
+#include "managemediaplayercontrol.h"
 #include "mediaplaylist.h"
 #include "mediaplaylistproxymodel.h"
-#include "audiowrapper.h"
-#include "manageaudioplayer.h"
-#include "managemediaplayercontrol.h"
-#include "manageheaderbar.h"
-#include "databaseinterface.h"
+#include "scrobblemanager.h"
 
 #include "elisa_settings.h"
 #include <KAuthorized>
@@ -84,6 +85,8 @@ public:
     std::unique_ptr<ManageMediaPlayerControl> mPlayerControl;
 
     std::unique_ptr<ManageHeaderBar> mManageHeaderBar;
+
+    std::unique_ptr<ScrobbleManager> mScrobbleManager;
 
     QFileSystemWatcher mConfigFileWatcher;
 
@@ -389,6 +392,11 @@ void ElisaApplication::initializeModels()
     d->mMediaPlayListProxyModel->setPlayListModel(d->mMediaPlayList.get());
     Q_EMIT mediaPlayListProxyModelChanged();
 
+    d->mScrobbleManager = std::make_unique<ScrobbleManager>();
+    d->mScrobbleManager->setElisaApplication(this);
+    // Q_EMIT scrobbleManagerChanged();
+    // QObject::connect(d->mScrobbleManager.get(), "&ScrobbleManager::elisaApplicationChanged",this);
+
     d->mMusicManager->setElisaApplication(this);
 
     QObject::connect(this, &ElisaApplication::enqueue,
@@ -451,6 +459,15 @@ void ElisaApplication::initializePlayer()
     QObject::connect(d->mAudioWrapper.get(), &AudioWrapper::positionChanged, d->mAudioControl.get(), &ManageAudioPlayer::setPlayerPosition);
     QObject::connect(d->mAudioWrapper.get(), &AudioWrapper::currentPlayingForRadiosChanged, d->mAudioControl.get(), &ManageAudioPlayer::setCurrentPlayingForRadios);
 
+    // TODO LASTFM CONNS
+    QObject::connect(d->mAudioWrapper.get(), &AudioWrapper::durationChanged, d->mScrobbleManager.get(), &ScrobbleManager::audioDurationChanged);
+    QObject::connect(d->mAudioWrapper.get(), &AudioWrapper::positionChanged, d->mScrobbleManager.get(), &ScrobbleManager::positionChanged);
+    QObject::connect(d->mMediaPlayListProxyModel.get(),
+                     &MediaPlayListProxyModel::currentTrackChanged,
+                     d->mScrobbleManager.get(),
+                     &ScrobbleManager::currentTrackChanged);
+    QObject::connect(d->mAudioControl.get(), &ManageAudioPlayer::seek, d->mScrobbleManager.get(), &ScrobbleManager::seekChanged);
+
     QObject::connect(d->mMediaPlayListProxyModel.get(), &MediaPlayListProxyModel::currentTrackChanged, d->mPlayerControl.get(), &ManageMediaPlayerControl::setCurrentTrack);
     QObject::connect(d->mMediaPlayListProxyModel.get(), &MediaPlayListProxyModel::previousTrackChanged, d->mPlayerControl.get(), &ManageMediaPlayerControl::setPreviousTrack);
     QObject::connect(d->mMediaPlayListProxyModel.get(), &MediaPlayListProxyModel::nextTrackChanged, d->mPlayerControl.get(), &ManageMediaPlayerControl::setNextTrack);
@@ -510,7 +527,10 @@ MediaPlayListProxyModel *ElisaApplication::mediaPlayListProxyModel() const
     return d->mMediaPlayListProxyModel.get();
 }
 
-
+ScrobbleManager *ElisaApplication::scrobbleManager() const
+{
+    return d->mScrobbleManager.get();
+}
 AudioWrapper *ElisaApplication::audioPlayer() const
 {
     return d->mAudioWrapper.get();

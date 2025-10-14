@@ -10,11 +10,12 @@
 
 #include "elisa_settings.h"
 
+#include <QDebug>
 
-#include <QStandardPaths>
 #include <QFileInfo>
+#include <QStandardPaths>
 #include <QTimer>
-
+#include <stdio.h>
 ElisaConfigurationDialog::ElisaConfigurationDialog(QObject* parent)
     : QObject(parent)
 {
@@ -180,6 +181,18 @@ void ElisaConfigurationDialog::setEmbeddedView(ElisaUtils::PlayListEntryType emb
 
     mEmbeddedView = embeddedView;
     QTimer::singleShot(0, this, &ElisaConfigurationDialog::embeddedViewChanged);
+
+    setDirty();
+}
+
+void ElisaConfigurationDialog::setScrobble(ScrobbleManager::ScrobbleProvider scrobble)
+{
+    if (mScrobble == scrobble) {
+        return;
+    }
+
+    mScrobble = scrobble;
+    Q_EMIT scrobbleChanged();
 
     setDirty();
 }

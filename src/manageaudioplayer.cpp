@@ -429,6 +429,7 @@ void ManageAudioPlayer::setCurrentPlayingForRadios(const QString &title, const Q
 void ManageAudioPlayer::setPlayControlPosition(int playerPosition)
 {
     qCDebug(orgKdeElisaPlayer()) << "ManageAudioPlayer::setPlayControlPosition" << playerPosition;
+
     Q_EMIT seek(playerPosition);
 }
 

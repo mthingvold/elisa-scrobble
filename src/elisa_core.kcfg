@@ -90,5 +90,11 @@
   </entry>
   <entry key="ViewStylePreferences" type="StringList">
   </entry>
+  <entry key="LastFMAPIAuthentication" type="String">
+  <default>
+  "0bc3abb05a8b9a668960bf39677a9f6d"
+  </default>
+  </entry>
+
  </group>
 </kcfg>

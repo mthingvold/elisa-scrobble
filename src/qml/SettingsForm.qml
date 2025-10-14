@@ -151,7 +151,6 @@ ColumnLayout {
             text: i18nc("@option:radio", "0-5 stars")
 
             QQC2.ButtonGroup.group: ratingStyleGroup
-
             checked: !ElisaConfigurationDialog.useFavoriteStyleRatings
             onToggled: ElisaConfigurationDialog.useFavoriteStyleRatings = !checked
             Accessible.onToggleAction: onToggled
@@ -382,6 +381,78 @@ ColumnLayout {
                 font: Kirigami.Theme.smallFont
             }
         }
+
+
+        RowLayout {
+            spacing: Kirigami.Units.smallSpacing
+
+            visible: !Kirigami.Settings.isMobile
+
+            Kirigami.FormData.label: i18nc("@label:listbox", "Scrobbling:")
+
+            //TODO Change name
+
+            QQC2.ComboBox{
+                id: scrobbleSupport
+                //TODO: Change these boxes
+                model: [i18nc("@item:inlistbox Configure dialog, embed no category in views navigation list", "None"),
+                    i18nc("@item:inlistbox Configure dialog, embed all albums in views navigation list", "Last.fm"),
+                    i18nc("@item:inlistbox Configure dialog, embed all artists in views navigation list", "ListenBrainz"),
+                    i18nc("@item:inlistbox Configure dialog, embed all genres in views navigation list", "GNUfmlol")]
+
+                editable: false
+
+                function getScrobbleIndex(index) {
+
+                    switch(index){
+                    case ScrobbleManager.LastFM:
+                        connectToScrobbler.text = "Connect to Last FM"
+                        connectToScrobbler.visible = true
+                        connectToScrobbler.enabled = true
+
+                        break
+                    case ScrobbleManager.ListenBrainz:
+                        connectToScrobbler.text = "Connect to ListenBrainz"
+                        connectToScrobbler.visible = true
+                        connectToScrobbler.enabled = true
+                        break
+                    default:
+                        connectToScrobbler.visible = false
+                        connectToScrobbler.enabled = false
+                        break
+                    }
+
+                }
+
+                currentIndex: ElisaConfigurationDialog.scrobbleView
+                onCurrentIndexChanged: getScrobbleIndex(currentIndex)
+                
+
+                onActivated: {
+                    getScrobbleIndex(currentIndex)
+                }
+
+                // Connections {
+                //     target: ElisaConfigurationDialog
+                // //TODO Figure out what this does or delete it?
+                //     function onScrobbleViewChanged(){
+                //         connectToScrobbler.enabled = true
+                //         }
+                //     }
+
+                // }
+            }
+            QQC2.Button {
+                id: connectToScrobbler
+                enabled: false
+                visible: false
+                //icon.name: "document-open-folder"
+                text: i18nc("@action:button", "Connect to ")
+                onClicked: ElisaApplication.scrobbleManager.connectToScrobbler(scrobbleSupport.currentIndex)
+                
+
+            }
+        }
     }
 
     // Music locations list
@@ -478,4 +549,6 @@ ColumnLayout {
             }
         }
     }
+
+
 }

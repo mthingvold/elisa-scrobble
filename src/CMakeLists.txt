@@ -20,6 +20,7 @@ set(elisaLib_SOURCES
     elisaapplication.cpp
     modeldataloader.cpp
     elisautils.cpp
+    scrobble/scrobblemanager.cpp
     abstractfile/abstractfilelistener.cpp
     abstractfile/abstractfilelisting.cpp
     filescanner.cpp
@@ -49,6 +50,7 @@ set(elisaLib_INCLUDEDIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/file
     ${CMAKE_CURRENT_SOURCE_DIR}/localFileConfiguration
     ${CMAKE_CURRENT_SOURCE_DIR}/models
+    ${CMAKE_CURRENT_SOURCE_DIR}/scrobble
 )
 
 ecm_qt_declare_logging_category(elisaLib_SOURCES
@@ -111,6 +113,13 @@ ecm_qt_declare_logging_category(elisaLib_SOURCES
     HEADER "powerManagementLogging.h"
     IDENTIFIER "orgKdeElisaPowerManagement"
     CATEGORY_NAME "org.kde.elisa.powermanagement"
+    DEFAULT_SEVERITY Info
+    )
+
+ecm_qt_declare_logging_category(elisaLib_SOURCES
+    HEADER "scrobbleManagerLogging.h"
+    IDENTIFIER "orgKdeElisaScrobbleManager"
+    CATEGORY_NAME "org.kde.elisa.scrobblemanager"
     DEFAULT_SEVERITY Info
     )
 
@@ -415,7 +424,8 @@ if (Qt6Quick_FOUND AND Qt6Widgets_FOUND)
     # add icons to application sources, to have them bundled
     ecm_add_app_icon(elisa_SOURCES ICONS ${elisa_ICONS_PNG})
 
-    add_executable(elisa ${elisa_SOURCES})
+    add_executable(elisa ${elisa_SOURCES}
+        scrobble/lastfmscrobble.h scrobble/lastfmscrobble.cpp)
 
     target_include_directories(elisa PRIVATE ${KDSoap_INCLUDE_DIRS})
 

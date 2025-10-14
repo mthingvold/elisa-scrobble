@@ -10,6 +10,7 @@
 #include "elisaLib_export.h"
 
 #include "elisautils.h"
+#include "scrobble/scrobblemanager.h"
 
 #include <QStringList>
 #include <QFileSystemWatcher>
@@ -53,6 +54,8 @@ class ELISALIB_EXPORT ElisaConfigurationDialog : public QObject
                READ embeddedView
                WRITE setEmbeddedView
                NOTIFY embeddedViewChanged)
+
+    Q_PROPERTY(ScrobbleManager::ScrobbleProvider scrobble READ scrobbleView WRITE setScrobble NOTIFY scrobbleChanged)
 
     Q_PROPERTY(int initialViewIndex
                READ initialViewIndex
@@ -149,6 +152,16 @@ public:
         return mScanAtStartup;
     }
 
+    [[nodiscard]] ScrobbleManager::ScrobbleProvider scrobbleView() const
+    {
+        return mScrobble;
+    }
+
+    [[nodiscard]] QString colorScheme() const
+    {
+        return mColorScheme;
+    }
+
     [[nodiscard]] bool useFavoriteStyleRatings() const
     {
         return mUseFavoriteStyleRatings;
@@ -181,6 +194,10 @@ Q_SIGNALS:
 
     void scanAtStartupChanged();
 
+    void scrobbleChanged();
+
+    void colorSchemeChanged();
+
     void useFavoriteStyleRatingsChanged();
 
 public Q_SLOTS:
@@ -208,6 +225,10 @@ public Q_SLOTS:
     void setPlayAtStartup(bool playAtStartup);
 
     void setScanAtStartup(bool scanAtStartup);
+
+    void setScrobble(ScrobbleManager::ScrobbleProvider scrobble);
+
+    void setColorScheme(const QString &scheme);
 
     void setUseFavoriteStyleRatings(bool useFavoriteStyleRatings);
 
@@ -240,6 +261,8 @@ private:
     bool mUseFavoriteStyleRatings = false;
 
     ElisaUtils::PlayListEntryType mEmbeddedView = ElisaUtils::Unknown;
+
+    ScrobbleManager::ScrobbleProvider mScrobble = ScrobbleManager::ScrobbleProvider::None;
 
     int mInitialViewIndex = 2;
 

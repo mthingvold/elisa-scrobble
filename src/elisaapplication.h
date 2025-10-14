@@ -29,6 +29,7 @@ class AudioWrapper;
 class ManageAudioPlayer;
 class ManageMediaPlayerControl;
 class ManageHeaderBar;
+class ScrobbleManager;
 class ElisaApplicationPrivate;
 class KColorSchemeManager;
 class QAbstractItemModel;
@@ -59,6 +60,7 @@ class ELISALIB_EXPORT ElisaApplication : public QObject
                READ mediaPlayListProxyModel
                NOTIFY mediaPlayListProxyModelChanged)
 
+    Q_PROPERTY(ScrobbleManager *scrobbleManager READ scrobbleManager NOTIFY scrobbleManagerChanged)
 
     Q_PROPERTY(AudioWrapper *audioPlayer
                READ audioPlayer
@@ -133,6 +135,8 @@ public:
 
     [[nodiscard]] ManageHeaderBar *manageHeaderBar() const;
 
+    [[nodiscard]] ScrobbleManager *scrobbleManager() const;
+
     [[nodiscard]] bool showNowPlayingBackground() const;
 
     [[nodiscard]] bool showProgressOnTaskBar() const;
@@ -163,6 +167,8 @@ Q_SIGNALS:
     void audioControlChanged();
 
     void playerControlChanged();
+
+    void scrobbleManagerChanged();
 
     void manageHeaderBarChanged();
 
